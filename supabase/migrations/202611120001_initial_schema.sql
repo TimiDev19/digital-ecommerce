@@ -8,7 +8,7 @@ create table public.profiles (
 );
 create table public.products (
   id text primary key, name text not null, category text not null,
-  description text not null default '', price_ngn integer not null check(price_ngn > 0),
+  description text not null default '', price_ngn integer check(price_ngn is null or price_ngn > 0),
   cover_image_url text, storage_path text, is_active boolean not null default true,
   is_featured boolean not null default false, created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
@@ -57,28 +57,8 @@ create policy "admins manage private product files" on storage.objects for all u
 
 -- Seed catalog mirrors the development storefront. Replace cover art and upload private files in production.
 insert into public.products(id,name,category,description,price_ngn,cover_image_url,is_active,is_featured) values
-('folio','Folio — the brand system','Branding','A complete visual identity toolkit for thoughtful businesses.',48000,'https://images.unsplash.com/photo-1545235617-9465d2a55698',true,true),
-('atelier','Atelier UI library','UI & Web','A quietly confident interface system for your next launch.',64000,'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8',true,true),
-('still-life','Still Life presets','Photography','Warm, tactile tones for images that feel like memories.',28000,'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',true,true),
-('fieldnotes','Fieldnotes — 52 prompts','Templates','A year of gentle structure for your most ambitious ideas.',22000,'https://images.unsplash.com/photo-1455390582262-044c5658c1d2',true,true),
-('objects','Objects in use','Photography','A library of 84 beautifully imperfect product scenes.',36000,'https://images.unsplash.com/photo-1490312278390-ab64016e0aa9',true,false),
-('type-foundry','The quiet type foundry','Typography','Six expressive typefaces for brands with a point of view.',72000,'https://images.unsplash.com/photo-1509223197845-458d87318791',true,false),
-('studio-sounds','Studio sounds vol. 01','Audio','Textural sound for films, interfaces and in-between moments.',18000,'https://images.unsplash.com/photo-1511379938547-c1f69419868d',true,false),
-('sunday','Sunday recipe journal','Templates','A digital home for recipes worth making more than once.',16000,'https://images.unsplash.com/photo-1490645935967-10de6ba17061',true,false)
+('esim','eSIM','eSIM','Stay connected on your trip. Ask us about destinations, data plans and setup.',null,'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',true,true),
+('gift','Gift cards','Gifts','Find a gift card that fits. Message us with the brand and amount you have in mind.',null,'https://images.unsplash.com/photo-1513201099705-a9746e1e201f',true,true),
+('online-banking','Online banking','Online Banking','Get in touch to discuss the online banking service you need.',null,'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d',true,true),
+('flight-ticket','Flight tickets','Flight Tickets','Tell us your destination and travel dates and we’ll help with your flight ticket enquiry.',null,'https://images.unsplash.com/photo-1436491865332-7a61a109cc05',true,true)
 on conflict(id) do nothing;
-
--- Explicit Data API privileges; RLS remains the row-level authorization boundary.
-grant select on public.products to anon, authenticated;
-grant select, update on public.profiles to authenticated;
-grant select, insert, update, delete on public.carts, public.cart_items, public.wishlists, public.wishlist_items to authenticated;
-grant select on public.orders, public.order_items, public.payments, public.downloads to authenticated;
-grant insert on public.reviews, public.downloads to authenticated;
-grant select on public.reviews to anon, authenticated;
-grant insert on public.newsletter_subscribers to anon, authenticated;
-grant execute on function public.is_admin() to anon, authenticated;
-create index order_items_order_idx on public.order_items(order_id);
-create index order_items_product_idx on public.order_items(product_id);
-create index cart_items_product_idx on public.cart_items(product_id);
-create index wishlist_items_product_idx on public.wishlist_items(product_id);
-create index products_featured_idx on public.products(is_featured) where is_active and is_featured;
-revoke all on function public.handle_new_user() from public, anon, authenticated;

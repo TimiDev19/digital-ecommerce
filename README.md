@@ -1,4 +1,4 @@
-# Forma
+# Steph Hub
 
 A considered digital goods storefront built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, Redux Toolkit, Supabase and Paystack.
 
@@ -27,4 +27,4 @@ Never put the Supabase service role key or Paystack secret in a `NEXT_PUBLIC_` v
 - Server price lookup, Paystack initialization, signature-checked and transaction-verified webhook fulfillment, private signed downloads, download history.
 - Supabase schema and seeded development catalog, SEO metadata, sitemap and robots rules.
 
-The catalog uses the included seed products and illustrative cover imagery. Add the actual deliverable files to the private Storage bucket and populate `storage_path` before accepting production orders. Paystack and Supabase cannot be live until credentials and webhook configuration are provided.
+The included catalog lists Steph Hub’s eSIM, gift card, online banking and flight ticket services. Prices are intentionally unset until supplied; customers are directed to WhatsApp or email for current quotes. Supabase and Paystack credentials are required before enabling live payments.
