@@ -1,0 +1,9 @@
+'use client';
+import {useEffect} from 'react';
+import {AnimatePresence,motion} from 'framer-motion';
+import {AlertTriangle} from 'lucide-react';
+
+export function AdminConfirmDialog({open,title,description,confirmLabel='Confirm',danger=true,busy=false,error,onConfirm,onCancel}:{open:boolean;title:string;description:string;confirmLabel?:string;danger?:boolean;busy?:boolean;error?:string;onConfirm:()=>void;onCancel:()=>void}){
+ useEffect(()=>{if(!open)return;const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape'&&!busy)onCancel()};window.addEventListener('keydown',handleKey);return()=>window.removeEventListener('keydown',handleKey)},[open,busy,onCancel]);
+ return <AnimatePresence>{open&&<motion.div className="admin-confirm-backdrop" role="presentation" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onMouseDown={event=>{if(event.target===event.currentTarget&&!busy)onCancel()}}><motion.section className="admin-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="admin-confirm-title" aria-describedby="admin-confirm-description" initial={{opacity:0,y:12,scale:.98}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:8,scale:.98}} transition={{duration:.18}}><span className={`admin-confirm-icon ${danger?'danger':''}`}><AlertTriangle size={19}/></span><h2 id="admin-confirm-title">{title}</h2><p id="admin-confirm-description">{description}</p>{error&&<p className="admin-confirm-error" role="alert">{error}</p>}<div className="admin-confirm-actions"><button type="button" className="admin-confirm-cancel" onClick={onCancel} disabled={busy}>Cancel</button><button type="button" className={`admin-confirm-submit ${danger?'danger':''}`} onClick={onConfirm} disabled={busy}>{busy?'Please wait…':confirmLabel}</button></div></motion.section></motion.div>}</AnimatePresence>
+}

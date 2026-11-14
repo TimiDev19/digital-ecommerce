@@ -7,10 +7,10 @@ create table public.profiles (
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 create table public.products (
-  id text primary key, name text not null, category text not null,
-  description text not null default '', price_ngn integer check(price_ngn is null or price_ngn > 0),
+  id text primary key default gen_random_uuid()::text, name text not null, category text not null,
+  description text not null default '', price_ngn integer not null check(price_ngn > 0),
   cover_image_url text, storage_path text, is_active boolean not null default true,
-  is_featured boolean not null default false, created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+  is_featured boolean not null default true, created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 create index products_active_category_idx on public.products(category) where is_active;
 create table public.carts (id uuid primary key default gen_random_uuid(), user_id uuid not null unique references public.profiles(id) on delete cascade, updated_at timestamptz not null default now());
@@ -54,11 +54,3 @@ create policy "newsletter subscribe" on public.newsletter_subscribers for insert
 insert into storage.buckets(id,name,public) values('digital-products','digital-products',false) on conflict(id) do nothing;
 create policy "purchased users can read product files" on storage.objects for select using(bucket_id='digital-products' and exists(select 1 from public.order_items oi join public.orders o on o.id=oi.order_id join public.products p on p.id=oi.product_id where p.storage_path=name and o.user_id=auth.uid() and o.status='paid'));
 create policy "admins manage private product files" on storage.objects for all using(bucket_id='digital-products' and public.is_admin()) with check(bucket_id='digital-products' and public.is_admin());
-
--- Seed catalog mirrors the development storefront. Replace cover art and upload private files in production.
-insert into public.products(id,name,category,description,price_ngn,cover_image_url,is_active,is_featured) values
-('esim','eSIM','eSIM','Stay connected on your trip. Ask us about destinations, data plans and setup.',null,'https://images.unsplash.com/photo-1516321318423-f06f85e504b3',true,true),
-('gift','Gift cards','Gifts','Find a gift card that fits. Message us with the brand and amount you have in mind.',null,'https://images.unsplash.com/photo-1513201099705-a9746e1e201f',true,true),
-('online-banking','Online banking','Online Banking','Get in touch to discuss the online banking service you need.',null,'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d',true,true),
-('flight-ticket','Flight tickets','Flight Tickets','Tell us your destination and travel dates and we’ll help with your flight ticket enquiry.',null,'https://images.unsplash.com/photo-1436491865332-7a61a109cc05',true,true)
-on conflict(id) do nothing;
