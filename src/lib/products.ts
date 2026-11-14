@@ -1,4 +1,4 @@
-export type Product = { id:string; name:string; category:string; description:string; price:number; image:string; label?:string; tone:string; rating:string; featured?:boolean };
+export type Product = { id:string; name:string; category:string; description:string; price:number; image:string; label?:string; tone:string; rating:string; featured?:boolean; requires_clothing_size?:boolean; requires_ring_size?:boolean; allows_customization?:boolean };
 export const products:Product[]=[];
 export const formatNaira=(amount:number)=>amount.toLocaleString('en-NG',{maximumFractionDigits:0});
 export const productImageFallback='https://images.unsplash.com/photo-1545235617-9465d2a55698?auto=format&fit=crop&w=1100&q=85';
@@ -15,5 +15,5 @@ export const storeCategories:ShopCategory[]=[{name:'eSIM',slug:'esim',descriptio
 export const categories=['All products',...storeCategories.map(category=>category.name)];
 export const categoryFromSlug=(slug:string)=>storeCategories.find(category=>category.slug===slug);
 export const whatsappNumber='2348154788459';
-export const whatsappUrl=(service?:string)=>`https://wa.me/${whatsappNumber}${service?`?text=${encodeURIComponent(`Hi Steph Hub, I’d like to ask about ${service}.`)}`:''}`;
+export const whatsappUrl=(service?:string)=>`https://wa.me/${whatsappNumber}${service?`?text=${encodeURIComponent(`Hi StephGifts, I’d like to ask about ${service}.`)}`:''}`;
 export const orderEmail='oduneyestephen04@gmail.com';

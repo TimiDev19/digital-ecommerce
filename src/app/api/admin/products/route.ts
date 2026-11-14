@@ -8,6 +8,9 @@ const fields={
  description:z.string().max(2000).optional().default(''),
  price_ngn:z.number().int().positive().max(100000000),
  cover_image_url:z.string().url().optional().or(z.literal('')),
+ requires_clothing_size:z.boolean().optional().default(false),
+ requires_ring_size:z.boolean().optional().default(false),
+ allows_customization:z.boolean().optional().default(false),
 };
 const createSchema=z.object(fields);
 const updateSchema=createSchema.partial().extend({id:z.string().min(1).max(100),is_active:z.boolean().optional()}).refine(input=>Object.keys(input).some(key=>key!=='id'),{message:'Include at least one product field to update.'});

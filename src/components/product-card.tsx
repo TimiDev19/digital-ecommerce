@@ -1,6 +1,6 @@
 'use client';
 import {useDispatch,useSelector} from 'react-redux';
-import {addItem,openCart,toggleWishlist} from '@/lib/cart';
+import {addItem,toggleWishlist} from '@/lib/cart';
 import type {Product} from '@/lib/products';
 import {ArrowUpRight,Heart,MessageCircle,Plus,Check} from 'lucide-react';
 import {motion} from 'framer-motion';
@@ -23,7 +23,7 @@ export function ProductCard({product,index=0}:{product:Product;index?:number}){
    </Link>
    <button className={`wishlist-button ${saved?'saved':''}`} onClick={()=>dispatch(toggleWishlist(product.id))} aria-label={saved?'Remove from wishlist':'Add to wishlist'} aria-pressed={saved}><Heart size={16} fill={saved?'currentColor':'none'}/></button>
   </div>
-  <div className="product-info"><div><Link href={`/product/${product.id}`} className="product-name">{product.name}</Link><p>{product.description}</p></div><div className="product-buy"><span>₦{formatNaira(product.price)}</span><button className={inBag?'is-in-bag':''} onClick={()=>dispatch(addItem(product))} aria-label={inBag?`${product.name} is in your bag`:`Add ${product.name} to your bag`} title={inBag?'Already in your bag':'Add to bag'}>{inBag?<Check size={16}/>:<Plus size={16}/>}</button><a href={whatsappUrl(product.name)} target="_blank" rel="noreferrer" aria-label={`Ask Steph Hub about ${product.name}`}><MessageCircle size={15}/></a></div></div>
-  <div className="bag-feedback" aria-live="polite">{inBag?<button type="button" onClick={()=>dispatch(openCart())}>In your bag · View bag</button>:null}</div>
+  <div className="product-info"><div><Link href={`/product/${product.id}`} className="product-name">{product.name}</Link><p>{product.description}</p></div><div className="product-buy"><span>₦{formatNaira(product.price)}</span><button className={inBag?'is-in-bag':''} onClick={()=>dispatch(addItem(product))} aria-label={inBag?`${product.name} is in your cart`:`Add ${product.name} to your cart`} title={inBag?'Already in your cart':'Add to cart'}>{inBag?<Check size={16}/>:<Plus size={16}/>}</button><a href={whatsappUrl(product.name)} target="_blank" rel="noreferrer" aria-label={`Ask StephGifts about ${product.name}`}><MessageCircle size={15}/></a></div></div>
+  <div className="bag-feedback" aria-live="polite">{inBag?<button type="button" onClick={()=>{window.location.href='/cart'}}>In your cart · View cart</button>:null}</div>
  </motion.article>
 }

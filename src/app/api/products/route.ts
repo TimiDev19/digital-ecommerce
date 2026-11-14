@@ -9,7 +9,7 @@ export async function GET(request:Request){
  const db=createClient(url,key,{auth:{persistSession:false}});
  let categoryName:string|undefined;
  if(categorySlug){const {data:category}=await db.from('categories').select('name').eq('slug',categorySlug).eq('is_active',true).maybeSingle();if(!category)return NextResponse.json({error:'Category not found.'},{status:404});categoryName=category.name;}
- let query=db.from('products').select('id,name,category,description,price_ngn,cover_image_url,is_active,created_at,updated_at').eq('is_active',true).order('created_at',{ascending:false});
+ let query=db.from('products').select('id,name,category,description,price_ngn,cover_image_url,is_active,requires_clothing_size,requires_ring_size,allows_customization,created_at,updated_at').eq('is_active',true).order('created_at',{ascending:false});
  if(categoryName)query=query.eq('category',categoryName);
  const {data,error}=await query;
  if(error)return NextResponse.json({error:'Catalog unavailable.'},{status:503});
