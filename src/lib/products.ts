@@ -11,7 +11,10 @@ export const legacyPlaceholderProductIds = new Set([
   'flight-lagos-london','flight-lagos-dubai','flight-lagos-accra',
 ]);
 export type ShopCategory={id?:string;name:string;slug:string;description:string;display_order?:number;is_active?:boolean};
-export const storeCategories:ShopCategory[]=[{name:'eSIM',slug:'esim',description:'Browse regional and global mobile data plans.'},{name:'Gifts',slug:'gifts',description:'Find digital gift cards for popular brands.'},{name:'Online Banking',slug:'online-banking',description:'Explore online banking setup and support.'},{name:'Flight Tickets',slug:'flight-tickets',description:'Browse routes and request a flight quote.'}] as const;
+export const hiddenCategoryNames=new Set(['online banking']);
+export const isVisibleCategoryName=(name:string)=>!hiddenCategoryNames.has(name.trim().toLowerCase());
+export const isVisibleCategory=(category:Pick<ShopCategory,'name'|'slug'>)=>category.slug!=='online-banking'&&isVisibleCategoryName(category.name);
+export const storeCategories:ShopCategory[]=[{name:'eSIM',slug:'esim',description:'Browse regional and global mobile data plans.'},{name:'Gifts',slug:'gifts',description:'Find digital gift cards for popular brands.'},{name:'Flight Tickets',slug:'flight-tickets',description:'Browse routes and request a flight quote.'}] as const;
 export const categories=['All products',...storeCategories.map(category=>category.name)];
 export const categoryFromSlug=(slug:string)=>storeCategories.find(category=>category.slug===slug);
 export const whatsappNumber='2348154788459';

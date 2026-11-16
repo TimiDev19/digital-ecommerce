@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {z} from 'zod';
 import {adminDatabase} from '@/lib/admin-db';
+import {isVisibleCategoryName} from '@/lib/products';
 
 const fields={
  name:z.string().trim().min(2).max(120),
@@ -15,7 +16,7 @@ const fields={
 const createSchema=z.object(fields);
 const updateSchema=createSchema.partial().extend({id:z.string().min(1).max(100),is_active:z.boolean().optional()}).refine(input=>Object.keys(input).some(key=>key!=='id'),{message:'Include at least one product field to update.'});
 function errorMessage(error:unknown,fallback:string){if(error&&typeof error==='object'&&'message'in error&&typeof error.message==='string')return error.message;if(error instanceof Error)return error.message;return fallback;}
-async function categoryIsActive(db:any,name:string){const {data,error}=await db.from('categories').select('id').eq('name',name).eq('is_active',true).maybeSingle();return !error&&!!data;}
+async function categoryIsActive(db:any,name:string){if(!isVisibleCategoryName(name))return false;const {data,error}=await db.from('categories').select('id').eq('name',name).eq('is_active',true).maybeSingle();return !error&&!!data;}
 
 export async function POST(request:Request){const context=await adminDatabase();if('response'in context)return context.response;try{const input=createSchema.parse(await request.json());if(!await categoryIsActive(context.db,input.category))return NextResponse.json({error:'Choose an active category. If this category should be available, confirm the categories migration has been applied.'},{status:400});const {data,error}=await context.db.from('products').insert({...input,is_featured:true,is_active:true}).select().single();if(error)throw error;return NextResponse.json({product:data},{status:201});}catch(error){return NextResponse.json({error:errorMessage(error,'Invalid product.')},{status:400});}}
 
