@@ -1,0 +1,2 @@
+import './return.css';
+export default function ReturnLoading(){return <main className="return-page return-loading" aria-label="Checking payment" aria-busy="true"><div className="loading-shimmer return-loading-kicker"/><div className="loading-shimmer return-loading-title"/><div className="loading-shimmer return-loading-copy"/><span className="loading-spinner-wrap" role="status"><span className="loading-spinner" aria-hidden="true"/><span>Checking your payment</span></span></main>}
