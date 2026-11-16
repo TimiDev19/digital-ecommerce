@@ -1,11 +1,11 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {categoryFromSlug,products as fallbackProducts,legacyPlaceholderProductIds,productImageFallback,isVisibleCategory,isVisibleCategoryName} from '@/lib/products';
+import {categoryFromSlug,products as fallbackProducts,legacyPlaceholderProductIds,productImageFallback,isVisibleCategory,isCatalogProductCategoryName} from '@/lib/products';
 function shape(product:any){return {...product,price:Number(product.price_ngn),image:product.cover_image_url||productImageFallback,tone:'#d7d3c8',rating:'—',featured:true,available:product.is_active,createdAt:product.created_at,updatedAt:product.updated_at};}
 export async function GET(request:Request){
  const categorySlug=new URL(request.url).searchParams.get('categorySlug');
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
- if(!url||!key){const category=categorySlug?categoryFromSlug(categorySlug):undefined;if(categorySlug&&!category)return NextResponse.json({error:'Category not found.'},{status:404});return NextResponse.json({products:fallbackProducts.filter(product=>isVisibleCategoryName(product.category)&&(!category||product.category===category.name))});}
+ if(!url||!key){const category=categorySlug?categoryFromSlug(categorySlug):undefined;if(categorySlug&&!category)return NextResponse.json({error:'Category not found.'},{status:404});return NextResponse.json({products:fallbackProducts.filter(product=>isCatalogProductCategoryName(product.category)&&(!category||product.category===category.name))});}
  const db=createClient(url,key,{auth:{persistSession:false}});
  const {data:categoryRows,error:categoryError}=await db.from('categories').select('name,slug').eq('is_active',true);
  if(categoryError)return NextResponse.json({error:'Categories unavailable.'},{status:503});
@@ -16,5 +16,5 @@ export async function GET(request:Request){
  if(categoryName)query=query.eq('category',categoryName);
  const {data,error}=await query;
  if(error)return NextResponse.json({error:'Catalog unavailable.'},{status:503});
- return NextResponse.json({products:(data||[]).filter(product=>!legacyPlaceholderProductIds.has(product.id)&&isVisibleCategoryName(product.category)&&visibleNames.has(product.category)).map(shape)});
+ return NextResponse.json({products:(data||[]).filter(product=>!legacyPlaceholderProductIds.has(product.id)&&isCatalogProductCategoryName(product.category)&&visibleNames.has(product.category)).map(shape)});
 }

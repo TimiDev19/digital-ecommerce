@@ -21,6 +21,7 @@ export async function POST(req:Request){
   const verifiedAt=new Date().toISOString();
   const {error:paymentError}=await db.from('payments').upsert({order_id:order.id,provider:'paystack',reference:tx.reference,amount:order.total_amount,currency:order.currency,status:'success',verified_at:verifiedAt},{onConflict:'reference'});if(paymentError)return jsonError('Payment record failed');
   if(order.status!=='paid'){const {error}=await db.from('orders').update({status:'paid',paid_at:verifiedAt}).eq('id',order.id).eq('status','pending');if(error)return jsonError('Order status update failed');}
+  if(tx.metadata?.flight_request_id){const {error}=await db.from('flight_ticket_requests').update({status:'paid',updated_at:verifiedAt}).eq('id',tx.metadata.flight_request_id).eq('order_id',order.id);if(error)return jsonError('Flight request payment status update failed');}
   const [{data:userResult,error:userError},{data:orderRows,error:itemsError}]=await Promise.all([db.auth.admin.getUserById(order.user_id),db.from('order_items').select('quantity,unit_amount,fulfillment_options,products(name,category)').eq('order_id',order.id)]);
   if(userError||!userResult.user?.email)return jsonError('Could not load the customer email.');if(itemsError||!orderRows?.length)return jsonError('Could not load the order summary.');
   const items:OrderEmailLine[]=orderRows.map((row:any)=>({name:row.products?.name||'Product',category:row.products?.category||'StephGifts',quantity:row.quantity,unitAmount:Number(row.unit_amount),options:row.fulfillment_options||{}}));

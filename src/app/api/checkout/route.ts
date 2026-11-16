@@ -3,7 +3,7 @@ import {createClient} from '@supabase/supabase-js';
 import {z} from 'zod';
 import {randomUUID} from 'node:crypto';
 import {supabaseServer} from '@/lib/supabase/server';
-import {legacyPlaceholderProductIds,isVisibleCategoryName} from '@/lib/products';
+import {legacyPlaceholderProductIds,isCatalogProductCategoryName} from '@/lib/products';
 
 const deliveryDetailsSchema=z.object({receiverName:z.string().trim().min(1,'Receiver name is required.').max(120),sender:z.string().trim().min(1,'Sender is required.').max(120),whatsappNumber:z.string().trim().min(7,'Enter a valid WhatsApp number.').max(32,'WhatsApp number is too long.'),address:z.string().trim().min(1,'Address is required.').max(500),apartment:z.string().trim().max(120).optional().default(''),city:z.string().trim().min(1,'City is required.').max(120),state:z.string().trim().min(1,'State is required.').max(120),zipCode:z.string().trim().min(1,'ZIP code is required.').max(32),note:z.string().max(250).optional().default('')});
 const clothingSizes=['S','M','L','XL','XXL','XXXL'];
@@ -25,7 +25,7 @@ export async function POST(req:Request){
   for(const item of parsedItems.data){const quantity=(quantities.get(item.id)||0)+item.quantity;if(quantity>99)return NextResponse.json({error:'A product quantity cannot exceed 99.'},{status:400});quantities.set(item.id,quantity);optionsById.set(item.id,(item.options||{}) as Record<string,string>)}
   const ids=[...quantities.keys()];if(ids.some(id=>legacyPlaceholderProductIds.has(id)))return NextResponse.json({error:'One or more products are unavailable.'},{status:400});
   const {data:products,error}=await db.from('products').select('id,name,price_ngn,is_active,category,requires_clothing_size,requires_ring_size,allows_customization').in('id',ids).eq('is_active',true);if(error)throw error;if(!products||products.length!==ids.length)return NextResponse.json({error:'One or more products are unavailable.'},{status:400});
-  if(products.some(product=>!isVisibleCategoryName(product.category)))return NextResponse.json({error:'One or more products are no longer available.'},{status:400});const containsGift=products.some(product=>product.category==='Gifts');if(containsGift&&!parsedDelivery?.success)return NextResponse.json({error:'Complete all required delivery details before payment.'},{status:400});
+  if(products.some(product=>!isCatalogProductCategoryName(product.category)))return NextResponse.json({error:'One or more products are no longer available.'},{status:400});const containsGift=products.some(product=>product.category==='Gifts');if(containsGift&&!parsedDelivery?.success)return NextResponse.json({error:'Complete all required delivery details before payment.'},{status:400});
   for(const product of products){const options=optionsById.get(product.id)||{};
    if(product.category==='eSIM'){for(const [key,label] of [['firstName','first name'],['lastName','last name'],['imei','IMEI'],['eid','EID'],['zipCode','ZIP code'],['email','email']] as const){if(!options[key]?.trim())return NextResponse.json({error:`Enter the ${label} for ${product.name}.`},{status:400})}if(!z.string().email().safeParse(options.email).success)return NextResponse.json({error:`Enter a valid email address for ${product.name}.`},{status:400})}
    else if(options.firstName||options.lastName||options.imei||options.eid||options.zipCode||options.email)return NextResponse.json({error:`eSIM details are not required for ${product.name}.`},{status:400});
