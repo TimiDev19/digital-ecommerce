@@ -11,7 +11,7 @@ insert into public.products (
 )
 values (
   'tmobile-refill', 'T mobile refill', 'eSIM',
-  'Choose a US dollar refill amount from $10 to $150. Converted at ₦1,400 per $1.',
+  'Choose a US dollar refill amount from $10 to $150.',
   14000, true, true, false, false, false, true
 )
 on conflict (id) do update set

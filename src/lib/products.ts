@@ -1,7 +1,9 @@
 export type Product = { id:string; name:string; category:string; description:string; price:number; image:string; label?:string; tone:string; rating:string; featured?:boolean; requires_clothing_size?:boolean; requires_ring_size?:boolean; allows_customization?:boolean; allows_tmobile_refill?:boolean };
 export const products:Product[]=[];
-export const tmobileRefillAmountsUsd=Array.from({length:29},(_,index)=>10+index*5);
-export const tmobileRefillNgn=(amountUsd:number)=>amountUsd*1400;
+export const tmobileRefillAmountsUsd=[10,15,20,25,30,40] as const;
+const tmobileRefillPricesNgn:Record<number,number>={10:19800,15:30000,20:37000,25:45000,30:59000,40:78000};
+export const tmobileRefillNgn=(amountUsd:number)=>tmobileRefillPricesNgn[amountUsd]??tmobileRefillPricesNgn[10];
+export const tmobileRefillStartingPriceNgn=tmobileRefillNgn(tmobileRefillAmountsUsd[0]);
 export const cartUnitPrice=(product:Pick<Product,'price'|'allows_tmobile_refill'>,options?:{tmobileRefillUsd?:string})=>product.allows_tmobile_refill?tmobileRefillNgn(Number(options?.tmobileRefillUsd)||10):product.price;
 export const formatNaira=(amount:number)=>amount.toLocaleString('en-NG',{maximumFractionDigits:0});
 export const productImageFallback='https://images.unsplash.com/photo-1545235617-9465d2a55698?auto=format&fit=crop&w=1100&q=85';

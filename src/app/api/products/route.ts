@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {products as fallbackProducts,legacyPlaceholderProductIds,productImageFallback,isVisibleCategory,isCatalogProductCategoryName} from '@/lib/products';
-function shape(product:any){return {...product,price:Number(product.price_ngn),image:product.cover_image_url||productImageFallback,tone:'#d7d3c8',rating:'—',featured:true,available:product.is_active,createdAt:product.created_at,updatedAt:product.updated_at};}
+function shape(product:any){const description=product.allows_tmobile_refill?String(product.description||'').replace(/\s*Converted at ₦1,400 per \$1\.?/i,''):product.description;return {...product,description,price:Number(product.price_ngn),image:product.cover_image_url||productImageFallback,tone:'#d7d3c8',rating:'—',featured:true,available:product.is_active,createdAt:product.created_at,updatedAt:product.updated_at};}
 export async function GET(request:Request){
  const categorySlug=new URL(request.url).searchParams.get('categorySlug');
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
