@@ -1,8 +1,8 @@
 export const countryCallingCodes=[
- {country:'Nigeria',code:'+234'},
  {country:'United States',code:'+1'},
  {country:'Canada',code:'+1'},
  {country:'United Kingdom',code:'+44'},
+ {country:'Nigeria',code:'+234'},
  {country:'Ghana',code:'+233'},
  {country:'South Africa',code:'+27'},
  {country:'Kenya',code:'+254'},
