@@ -7,7 +7,7 @@ import {legacyPlaceholderProductIds,isCatalogProductCategoryName,tmobileRefillAm
 import {countryCallingCodes} from '@/lib/country-calling-codes';
 
 const deliveryDetailsSchema=z.object({receiverName:z.string().trim().min(1,'Receiver name is required.').max(120),sender:z.string().trim().min(1,'Sender is required.').max(120),senderWhatsappNumber:z.string().trim().min(7,'Enter your WhatsApp number.').max(32,'Your WhatsApp number is too long.'),receiverWhatsappNumber:z.string().trim().max(32,'The receiver’s number is too long.').optional().default(''),country:z.string().trim().min(1,'Choose a delivery country.').max(120),address:z.string().trim().min(1,'Address is required.').max(500),apartment:z.string().trim().max(120).optional().default(''),city:z.string().trim().min(1,'City is required.').max(120),state:z.string().trim().min(1,'State is required.').max(120),zipCode:z.string().trim().min(1,'ZIP code is required.').max(32),note:z.string().max(250).optional().default('')});
-const validDeliveryCountries=new Set(countryCallingCodes.map(item=>item.country));
+const validDeliveryCountries=new Set<string>(countryCallingCodes.map(item=>item.country));
 const clothingSizes=['S','M','L','XL','XXL','XXXL'];
 const ringSizes=['4.5','5','5.5','6','6.5','7','7.5','8','8.5','9','9.5'];
 const allowedMime=new Set(['image/jpeg','image/png','image/webp','image/avif']);
