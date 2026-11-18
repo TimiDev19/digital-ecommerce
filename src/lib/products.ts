@@ -19,6 +19,7 @@ export const hiddenCategoryNames=new Set(['online banking','flight tickets']);
 export const isVisibleCategoryName=(name:string)=>!hiddenCategoryNames.has(name.trim().toLowerCase());
 export const isVisibleCategory=(category:Pick<ShopCategory,'name'|'slug'>)=>category.slug!=='online-banking'&&category.slug!=='flight-tickets'&&isVisibleCategoryName(category.name);
 export const isCatalogProductCategoryName=(name:string)=>isVisibleCategoryName(name);
+export const sameCatalogCategory=(left:string|undefined,right:string|undefined)=>!!left&&!!right&&left.trim().toLocaleLowerCase()===right.trim().toLocaleLowerCase();
 export function orderCategories<T extends Pick<ShopCategory,'name'|'slug'> & Partial<Pick<ShopCategory,'display_order'>>>(categories:T[]){return [...categories].sort((a,b)=>Number(!(a.slug==='gifts'||a.name.trim().toLowerCase()==='gifts'))-Number(!(b.slug==='gifts'||b.name.trim().toLowerCase()==='gifts'))||(a.display_order??0)-(b.display_order??0)||a.name.localeCompare(b.name));}
 export const whatsappNumber='2348154788459';
 export const whatsappUrl=(service?:string)=>`https://wa.me/${whatsappNumber}${service?`?text=${encodeURIComponent(`Hi StephGifts, I’d like to ask about ${service}.`)}`:''}`;

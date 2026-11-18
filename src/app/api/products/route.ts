@@ -9,18 +9,18 @@ export async function GET(request:Request){
  const db=createClient(url,key,{auth:{persistSession:false}});
  const {data:categoryRows,error:categoryError}=await db.from('categories').select('name,slug').eq('is_active',true);
  if(categoryError)return NextResponse.json({error:'Categories unavailable.'},{status:503});
- const visibleCategories=(categoryRows||[]).filter(isVisibleCategory);const visibleNames=new Set(visibleCategories.map(category=>category.name));
+ const visibleCategories=(categoryRows||[]).filter(isVisibleCategory);const visibleNames=new Map(visibleCategories.map(category=>[category.name.trim().toLocaleLowerCase(),category.name]));
  let categoryName:string|undefined;
  if(categorySlug){const category=visibleCategories.find(item=>item.slug===categorySlug);if(!category)return NextResponse.json({error:'Category not found.'},{status:404});categoryName=category.name;}
  const loadProducts=(includeSortOrder:boolean):any=>{
   let query:any=db.from('products').select(`id,name,category,description,price_ngn,cover_image_url,is_active,requires_clothing_size,requires_ring_size,allows_customization,allows_tmobile_refill,${includeSortOrder?'sort_order,':''}created_at,updated_at`).eq('is_active',true).order('created_at',{ascending:false});
-  if(categoryName)query=query.eq('category',categoryName);
+  if(categoryName)query=query.ilike('category',categoryName);
   return query;
  };
  let {data,error}:any=await loadProducts(true);
  if(error&&(error.code==='42703'||error.code==='PGRST204'||error.message?.includes('sort_order'))){const fallback=await loadProducts(false);data=fallback.data as typeof data;error=fallback.error;}
  if(error)return NextResponse.json({error:'Catalog unavailable.'},{status:503});
- const visible=(data||[]).filter((product:any)=>!legacyPlaceholderProductIds.has(product.id)&&isCatalogProductCategoryName(product.category)&&visibleNames.has(product.category)).map((product:any)=>({...product,sort_order:product.sort_order??0}));
+ const visible=(data||[]).filter((product:any)=>!legacyPlaceholderProductIds.has(product.id)&&isCatalogProductCategoryName(product.category)&&visibleNames.has(String(product.category).trim().toLocaleLowerCase())).map((product:any)=>({...product,category:visibleNames.get(String(product.category).trim().toLocaleLowerCase())||product.category,sort_order:product.sort_order??0}));
  const orderedGifts=visible.filter((product:any)=>product.category.toLowerCase()==='gifts').sort((a:any,b:any)=>a.sort_order-b.sort_order);
  let giftIndex=0;
  const ordered=visible.map((product:any)=>product.category.toLowerCase()==='gifts'?orderedGifts[giftIndex++]:product);

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import {useEffect,useMemo,useState} from 'react';
 import {useParams} from 'next/navigation';
 import {ArrowLeft,ArrowUpRight,Search,Smartphone,Gift,PackageOpen} from 'lucide-react';
-import {products,type Product,type ShopCategory,isVisibleCategory,isCatalogProductCategoryName,orderCategories} from '@/lib/products';
+import {products,type Product,type ShopCategory,isVisibleCategory,isCatalogProductCategoryName,orderCategories,sameCatalogCategory} from '@/lib/products';
 import {ProductCard} from '@/components/product-card';
 import {ProductGridSkeleton} from '@/components/loading-skeletons';
 import './category.css';
@@ -14,7 +14,7 @@ export default function CategoryPage(){
  const [query,setQuery]=useState('');
  const [loaded,setLoaded]=useState(false);const [categoryLoaded,setCategoryLoaded]=useState(false);
  useEffect(()=>{let active=true;fetch('/api/categories').then(r=>r.ok?r.json():null).then(data=>{if(active&&data?.categories){const found=orderCategories(data.categories.filter(isVisibleCategory) as ShopCategory[]).find(item=>item.slug===slug);setCategory(found)}}).catch(()=>{}).finally(()=>{if(active)setCategoryLoaded(true)});fetch(`/api/products?categorySlug=${encodeURIComponent(slug)}`).then(r=>r.ok?r.json():null).then(data=>{if(active&&data?.products)setCatalog((data.products as Product[]).filter(product=>isCatalogProductCategoryName(product.category)))}).catch(()=>{}).finally(()=>{if(active)setLoaded(true)});return()=>{active=false}},[slug]);
- const listings=useMemo(()=>catalog.filter(product=>product.category===category?.name&&`${product.name} ${product.description} ${product.category}`.toLowerCase().includes(query.trim().toLowerCase())),[catalog,category,query]);
+ const listings=useMemo(()=>catalog.filter(product=>sameCatalogCategory(product.category,category?.name)&&`${product.name} ${product.description} ${product.category}`.toLowerCase().includes(query.trim().toLowerCase())),[catalog,category,query]);
  if(!category&&!categoryLoaded)return <main className="container category-page category-loading" aria-busy="true"><div className="loading-shimmer loading-category-icon"/><div className="loading-shimmer loading-line loading-line-short"/><div className="loading-shimmer loading-category-title"/><div className="loading-shimmer loading-category-description"/></main>;
  if(!category)return <main className="container category-page"><Link className="back-link" href="/shop"><ArrowLeft size={14}/> Back to shop</Link><h1>Category not found</h1><p>Choose one of StephGifts’s product categories.</p><Link className="button dark" href="/shop">Browse all products</Link></main>;
  const Icon=category.slug==='esim'?Smartphone:category.slug==='gifts'?Gift:PackageOpen;
