@@ -31,3 +31,6 @@
 .phone-number-control input{flex:1;min-width:0}
 .phone-number-control select:focus{outline:none;border-color:#657d68;box-shadow:0 0 0 3px #657d681c}
 @media(max-width:420px){.phone-number-control{gap:6px}.phone-number-control select{flex-basis:46%;width:46%;min-width:122px;padding-left:9px;font-size:11px}}
+.delivery-fields select{width:100%;min-width:0;min-height:46px;padding:12px 38px 12px 14px;border:1px solid #d9ddd5;border-radius:9px;appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23747d73' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 13px center;color:#242a25;font:13px/1.45 Arial,Helvetica,sans-serif;box-shadow:0 1px 2px #17243b08;transition:border-color .18s,box-shadow .18s}
+.delivery-fields select:hover{border-color:#b9c2b7}
+.delivery-fields select:focus{outline:none;border-color:#657d68;box-shadow:0 0 0 3px #657d681c}
