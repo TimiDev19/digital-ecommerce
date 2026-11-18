@@ -25,3 +25,9 @@
 .cart-product-options>.tmobile-refill-select{grid-column:1/-1;max-width:360px}
 .gift-contact{margin-top:30px;padding:25px;background:#fff;border:1px solid #e4e5dd;border-radius:13px}.gift-contact h2{font:26px Georgia,serif;font-weight:400;margin:10px 0}.gift-contact>p{margin:0 0 17px;color:#777b71;font-size:11px;line-height:1.6}.gift-contact .delivery-fields{grid-template-columns:minmax(0,1fr)}@media(max-width:720px){.gift-contact{padding:21px 17px}}
 .esim-imei-help{grid-column:1/-1;margin-top:-8px;color:#7b8478;font-size:10px;font-weight:400;line-height:1.5}
+.cart-product-options-esim{grid-template-columns:minmax(0,1fr)}
+.phone-number-control{display:flex;align-items:stretch;gap:8px;width:100%;min-width:0}
+.phone-number-control select{flex:0 1 42%;width:42%;min-width:145px;max-width:205px;min-height:46px;padding:10px 30px 10px 12px;border:1px solid #d9ddd5;border-radius:9px;background-color:#fff;color:#39433a;font:12px Arial,Helvetica,sans-serif;box-shadow:0 1px 2px #17243b08}
+.phone-number-control input{flex:1;min-width:0}
+.phone-number-control select:focus{outline:none;border-color:#657d68;box-shadow:0 0 0 3px #657d681c}
+@media(max-width:420px){.phone-number-control{gap:6px}.phone-number-control select{flex-basis:46%;width:46%;min-width:122px;padding-left:9px;font-size:11px}}
