@@ -13,7 +13,7 @@ export async function GET(request:Request){
  let categoryName:string|undefined;
  if(categorySlug){const category=visibleCategories.find(item=>item.slug===categorySlug);if(!category)return NextResponse.json({error:'Category not found.'},{status:404});categoryName=category.name;}
  const loadProducts=(includeSortOrder:boolean):any=>{
-  let query:any=db.from('products').select(`id,name,category,description,price_ngn,cover_image_url,is_active,requires_clothing_size,requires_ring_size,allows_customization,allows_tmobile_refill,${includeSortOrder?'sort_order,':''}created_at,updated_at`).eq('is_active',true).order('created_at',{ascending:false});
+  let query:any=db.from('products').select(`id,name,category,description,price_ngn,cover_image_url,is_active,requires_clothing_size,requires_shoe_size,requires_ring_size,allows_customization,allows_tmobile_refill,${includeSortOrder?'sort_order,':''}created_at,updated_at`).eq('is_active',true).order('created_at',{ascending:false});
   if(categoryName)query=query.ilike('category',categoryName);
   return query;
  };

@@ -10,6 +10,7 @@ const fields={
  price_ngn:z.number().int().positive().max(100000000),
  cover_image_url:z.string().url().optional().or(z.literal('')),
  requires_clothing_size:z.boolean().optional().default(false),
+ requires_shoe_size:z.boolean().optional().default(false),
  requires_ring_size:z.boolean().optional().default(false),
  allows_customization:z.boolean().optional().default(false),
  allows_tmobile_refill:z.boolean().optional().default(false),

@@ -1,4 +1,4 @@
-export type Product = { id:string; name:string; category:string; description:string; price:number; image:string; label?:string; tone:string; rating:string; featured?:boolean; requires_clothing_size?:boolean; requires_ring_size?:boolean; allows_customization?:boolean; allows_tmobile_refill?:boolean };
+export type Product = { id:string; name:string; category:string; description:string; price:number; image:string; label?:string; tone:string; rating:string; featured?:boolean; requires_clothing_size?:boolean; requires_shoe_size?:boolean; requires_ring_size?:boolean; allows_customization?:boolean; allows_tmobile_refill?:boolean };
 export const products:Product[]=[];
 export const tmobileRefillAmountsUsd=[10,15,20,25,30,40] as const;
 const tmobileRefillPricesNgn:Record<number,number>={10:19800,15:30000,20:37000,25:45000,30:59000,40:78000};
