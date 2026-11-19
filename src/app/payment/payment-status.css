@@ -1,0 +1,21 @@
+.payment-status-page{min-height:68vh;display:grid;place-items:center;padding:78px 22px 110px;background:radial-gradient(ellipse at 50% 0%,#f8f2ed 0,transparent 52%)}
+.payment-status-card{width:min(100%,590px);padding:clamp(28px,6vw,58px);border:1px solid #e9e4df;border-radius:18px;background:#fff;box-shadow:0 20px 70px #3518110a;text-align:center}
+.payment-status-mark{width:66px;height:66px;display:grid;place-items:center;margin:0 auto 25px;border-radius:50%;background:#f2e9e5;color:#7d171d}
+.payment-success-card .payment-status-mark{background:#edf4ee;color:#3d7049}
+.payment-status-card>.eyebrow{display:block}
+.payment-status-card h1{margin:14px 0 17px;color:#281d1a;font:clamp(42px,8vw,62px)/1.03 Georgia,serif;font-weight:400;letter-spacing:-.055em}
+.payment-status-card h1 em{color:#7d171d;font-weight:400}
+.payment-status-copy{max-width:420px;margin:0 auto;color:#6d6a65;font-size:14px;line-height:1.75}
+.payment-reference{display:flex;align-items:center;justify-content:center;gap:12px;margin:26px auto 0;padding:13px 16px;border:1px solid #ece8e3;border-radius:10px;color:#746c65;text-align:left}
+.payment-reference span{display:flex;flex-direction:column;gap:4px;font-size:11px}
+.payment-reference strong{max-width:min(70vw,400px);overflow-wrap:anywhere;color:#342c29;font-size:12px;font-weight:600}
+.payment-status-note{display:flex;align-items:center;justify-content:center;gap:10px;margin:22px 0 0;padding:15px 17px;border-radius:10px;background:#f8f7f4;color:#726e68;text-align:left}
+.payment-status-note svg{flex:none;color:#7d171d}
+.payment-success-card .payment-status-note svg{color:#3d7049}
+.payment-status-note p{margin:0;font-size:11px;line-height:1.65}
+.payment-status-actions{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:28px}
+.payment-status-actions .button{min-width:220px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:7px;text-decoration:none}
+.payment-secondary-link{display:inline-flex;align-items:center;gap:7px;color:#625650;font-size:12px;text-decoration:none}
+.payment-secondary-link:hover{text-decoration:underline;text-underline-offset:4px}
+.payment-support-arrow{transform:rotate(135deg)}
+@media(max-width:480px){.payment-status-page{min-height:70vh;padding:48px 16px 75px}.payment-status-card{padding:31px 21px;border-radius:15px}.payment-status-mark{width:58px;height:58px;margin-bottom:20px}.payment-status-card h1{font-size:43px}.payment-status-copy{font-size:13px}.payment-reference{justify-content:flex-start}.payment-status-note{align-items:flex-start}}
