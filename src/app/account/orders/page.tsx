@@ -6,6 +6,7 @@ import {formatNaira} from '@/lib/products';
 import './orders.css';
 
 function orderDate(value:string){return new Date(value).toLocaleString('en-NG',{dateStyle:'medium',timeStyle:'short'})}
+function missingOptionalColumn(error:any){return error?.code==='42703'||error?.code==='PGRST204'||/column .* does not exist|schema cache/i.test(String(error?.message||''))}
 function optionSummary(options:Record<string,unknown>|null){
  if(!options)return [];
  const labels:[string,string][]=[['clothingSize','Clothing size'],['shoeSize','Shoe size'],['ringSize','Ring size'],['tmobileRefillUsd','Refill amount'],['mobileNumber','Mobile number'],['customizationText','Custom text']];
@@ -15,9 +16,12 @@ function optionSummary(options:Record<string,unknown>|null){
 export default async function OrderHistory(){
  let client;try{client=await supabaseServer()}catch{redirect('/account?redirect=%2Faccount%2Forders')}
  const {data:{user}}=await client.auth.getUser();if(!user)redirect('/account?redirect=%2Faccount%2Forders');
- const {data:orders,error}=await client.from('orders').select('id,status,fulfillment_status,total_amount,currency,created_at,delivery_details').eq('user_id',user.id).order('created_at',{ascending:false});
- const orderIds=(orders||[]).map(order=>order.id);
- const {data:items,error:itemError}=orderIds.length?await client.from('order_items').select('id,order_id,quantity,unit_amount,fulfillment_options,delivery_number,delivery_pin,products(name,category,cover_image_url)').in('order_id',orderIds):{data:[],error:null};
+ let orderResult:any=await client.from('orders').select('id,status,fulfillment_status,total_amount,currency,created_at,delivery_details').eq('user_id',user.id).order('created_at',{ascending:false});
+ if(orderResult.error&&missingOptionalColumn(orderResult.error))orderResult=await client.from('orders').select('id,status,total_amount,currency,created_at,delivery_details').eq('user_id',user.id).order('created_at',{ascending:false});
+ const orders=orderResult.data;const orderIds=(orders||[]).map((order:any)=>order.id);
+ let itemResult:any=orderIds.length?await client.from('order_items').select('id,order_id,quantity,unit_amount,fulfillment_options,delivery_number,delivery_pin,products(name,category,cover_image_url)').in('order_id',orderIds):{data:[],error:null};
+ if(itemResult.error&&missingOptionalColumn(itemResult.error))itemResult=await client.from('order_items').select('id,order_id,quantity,unit_amount,fulfillment_options,products(name,category,cover_image_url)').in('order_id',orderIds);
+ const items=itemResult.data;const error=orderResult.error;const itemError=itemResult.error;
  const itemsByOrder=new Map<string,any[]>();for(const item of items||[]){const list=itemsByOrder.get(item.order_id)||[];list.push(item);itemsByOrder.set(item.order_id,list)}
  const loadError=error||itemError;
  return <main className="container orders-page">
