@@ -1,9 +1,12 @@
 import Link from 'next/link';
+import {createClient} from '@supabase/supabase-js';
 import {redirect} from 'next/navigation';
 import {ArrowLeft,ArrowUpRight,Package} from 'lucide-react';
 import {supabaseServer} from '@/lib/supabase/server';
 import {formatNaira} from '@/lib/products';
 import './orders.css';
+
+export const dynamic='force-dynamic';
 
 function orderDate(value:string){return new Date(value).toLocaleString('en-NG',{dateStyle:'medium',timeStyle:'short'})}
 function missingOptionalColumn(error:any){return error?.code==='42703'||error?.code==='PGRST204'||/column .* does not exist|schema cache/i.test(String(error?.message||''))}
@@ -16,18 +19,23 @@ function optionSummary(options:Record<string,unknown>|null){
 export default async function OrderHistory(){
  let client;try{client=await supabaseServer()}catch{redirect('/account?redirect=%2Faccount%2Forders')}
  const {data:{user}}=await client.auth.getUser();if(!user)redirect('/account?redirect=%2Faccount%2Forders');
- let orderResult:any=await client.from('orders').select('id,status,fulfillment_status,total_amount,currency,created_at,delivery_details').eq('user_id',user.id).order('created_at',{ascending:false});
- if(orderResult.error&&missingOptionalColumn(orderResult.error))orderResult=await client.from('orders').select('id,status,total_amount,currency,created_at,delivery_details').eq('user_id',user.id).order('created_at',{ascending:false});
- const orders=orderResult.data;const orderIds=(orders||[]).map((order:any)=>order.id);
- let itemResult:any=orderIds.length?await client.from('order_items').select('id,order_id,quantity,unit_amount,fulfillment_options,delivery_number,delivery_pin,products(name,category,cover_image_url)').in('order_id',orderIds):{data:[],error:null};
- if(itemResult.error&&missingOptionalColumn(itemResult.error))itemResult=await client.from('order_items').select('id,order_id,quantity,unit_amount,fulfillment_options,products(name,category,cover_image_url)').in('order_id',orderIds);
- const items=itemResult.data;const error=orderResult.error;const itemError=itemResult.error;
+ const databaseUrl=process.env.NEXT_PUBLIC_SUPABASE_URL;const serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;const dataClient=databaseUrl&&serviceKey?createClient(databaseUrl,serviceKey,{auth:{persistSession:false}}):client;
+ const orderResult=await dataClient.from('orders').select('id,status,total_amount,currency,created_at').eq('user_id',user.id).order('created_at',{ascending:false});
+ if(orderResult.error)console.error('[account/orders] orders query failed:',{code:orderResult.error.code,message:orderResult.error.message,details:orderResult.error.details,hint:orderResult.error.hint});
+ const baseOrders=orderResult.data||[];const orderIds=baseOrders.map((order:any)=>order.id);
+ let fulfillmentById=new Map<string,string>();let deliveryById=new Map<string,any>();
+ if(orderIds.length){const [fulfillmentResult,deliveryResult]=await Promise.all([dataClient.from('orders').select('id,fulfillment_status').in('id',orderIds),dataClient.from('orders').select('id,delivery_details').in('id',orderIds)]);if(!fulfillmentResult.error)fulfillmentById=new Map((fulfillmentResult.data||[]).map((order:any)=>[order.id,order.fulfillment_status]));if(!deliveryResult.error)deliveryById=new Map((deliveryResult.data||[]).map((order:any)=>[order.id,order.delivery_details]));}
+ const orders=baseOrders.map((order:any)=>({...order,fulfillment_status:fulfillmentById.get(order.id)||'pending',delivery_details:deliveryById.get(order.id)||null}));
+ let itemResult:any=orderIds.length?await dataClient.from('order_items').select('id,order_id,quantity,unit_amount,fulfillment_options,delivery_number,delivery_pin,products(name,category,cover_image_url)').in('order_id',orderIds):{data:[],error:null};
+ if(itemResult.error&&missingOptionalColumn(itemResult.error))itemResult=await dataClient.from('order_items').select('id,order_id,quantity,unit_amount,fulfillment_options,products(name,category,cover_image_url)').in('order_id',orderIds);
+ if(itemResult.error&&missingOptionalColumn(itemResult.error))itemResult=await dataClient.from('order_items').select('id,order_id,quantity,unit_amount,products(name,category,cover_image_url)').in('order_id',orderIds);
+ const items=itemResult.data;const error=orderResult.error;const itemError=itemResult.error;if(itemError)console.error('[account/orders] item query failed:',{code:itemError.code,message:itemError.message,details:itemError.details,hint:itemError.hint});
  const itemsByOrder=new Map<string,any[]>();for(const item of items||[]){const list=itemsByOrder.get(item.order_id)||[];list.push(item);itemsByOrder.set(item.order_id,list)}
- const loadError=error||itemError;
+ const loadError=error;
  return <main className="container orders-page">
   <Link className="orders-back" href="/account/library"><ArrowLeft size={14}/> Back to your account</Link>
   <span className="eyebrow">Your StephGifts account</span><h1>Order history.</h1>
-  <p className="orders-intro">Every order you’ve placed, all in one place.</p>
+  <p className="orders-intro">Every order you’ve placed, all in one place.</p>{itemError&&<p className="orders-data-note">Some product details are temporarily unavailable. Your order records are still shown below.</p>}
   {loadError?<section className="orders-empty"><Package size={22}/><h2>Order history couldn’t load.</h2><p>Please refresh the page to try again.</p></section>:!orders?.length?<section className="orders-empty"><Package size={22}/><h2>Your first order is waiting.</h2><p>Orders you place will appear here with their status and details.</p><Link href="/shop">Browse the shop <ArrowUpRight size={14}/></Link></section>:<div className="orders-list">{orders.map((order:any)=>{
    const orderItems=itemsByOrder.get(order.id)||[];const delivery=order.delivery_details as Record<string,string>|null;
    return <article className="order-card" key={order.id}>
